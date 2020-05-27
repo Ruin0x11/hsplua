@@ -34,7 +34,7 @@ int hsplua_func::hl_tostring() {
 	const char* const tmpstr = lua_tostring(currState(), exinfo->HspFunc_prm_geti());
 	const size_t strsz = strlen(tmpstr);
 	char* const tmp_sval = ref_sval; // reallocŽ¸”s‘Îô
-	realloc(ref_sval, strsz + 1);
+    ref_sval=hspexpand(ref_sval, strsz + 1);
 	if (ref_sval == NULL) { // realloc Ž¸”sŽž
 		ref_sval = tmp_sval;
 		throw HSPERR_OUT_OF_MEMORY;
@@ -48,4 +48,27 @@ int hsplua_func::hl_tostring() {
 int hsplua_func::hl_touserdata() {
 	ref_val.ival = (int)lua_touserdata(currState(), exinfo->HspFunc_prm_geti());
 	return HSPVAR_FLAG_INT;
+}
+
+int hsplua_func::hl_gettop() {
+    ref_val.ival = lua_gettop(currState());
+    return HSPVAR_FLAG_INT;
+}
+
+int hsplua_func::hl_pcall() {
+    int argcount = exinfo->HspFunc_prm_geti();
+    int retcount = exinfo->HspFunc_prm_geti();
+    int errorhandler = exinfo->HspFunc_prm_geti();
+    ref_val.ival = lua_pcall(currState(), argcount, retcount, errorhandler);
+    return HSPVAR_FLAG_INT;
+}
+
+int hsplua_func::hl_dofile() {
+    ref_val.ival = luaL_dofile(currState(), exinfo->HspFunc_prm_gets());
+    return HSPVAR_FLAG_INT;
+}
+
+int hsplua_func::hl_dostring() {
+    ref_val.ival = luaL_dostring(currState(), exinfo->HspFunc_prm_gets());
+    return HSPVAR_FLAG_INT;
 }

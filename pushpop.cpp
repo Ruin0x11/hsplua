@@ -64,3 +64,62 @@ void hsplua_cmd::hl_pushvarptr() {
 	lua_pushlightuserdata(currState(), pval->pt);
 	return;
 }
+
+void hsplua_cmd::hl_gettable() {
+    lua_gettable(currState(), exinfo->HspFunc_prm_geti());
+    return;
+}
+
+void hsplua_cmd::hl_getmetatable() {
+    lua_getmetatable(currState(), exinfo->HspFunc_prm_geti());
+    return;
+}
+
+void hsplua_cmd::hl_getglobal() {
+    lua_getglobal(currState(), exinfo->HspFunc_prm_gets());
+    return;
+}
+
+void hsplua_cmd::hl_getfield() {
+    int index = exinfo->HspFunc_prm_geti();
+    const char* name = exinfo->HspFunc_prm_gets();
+    lua_getfield(currState(), index, name);
+    return;
+}
+
+void hsplua_cmd::hl_settable() {
+    lua_settable(currState(), exinfo->HspFunc_prm_geti());
+    return;
+}
+
+void hsplua_cmd::hl_setmetatable() {
+    lua_setmetatable(currState(), exinfo->HspFunc_prm_geti());
+    return;
+}
+
+void hsplua_cmd::hl_setglobal() {
+    lua_setglobal(currState(), exinfo->HspFunc_prm_gets());
+    return;
+}
+
+void hsplua_cmd::hl_setfield() {
+    int index = exinfo->HspFunc_prm_geti();
+    const char* name = exinfo->HspFunc_prm_gets();
+    lua_setfield(currState(), index, name);
+    return;
+}
+
+void hsplua_cmd::hl_pushglobaltable() {
+    lua_pushglobaltable(currState());
+    return;
+}
+
+void hsplua_cmd::hl_newmetatable() {
+    luaL_newmetatable(currState(), exinfo->HspFunc_prm_gets());
+    return;
+}
+
+void hsplua_cmd::hl_newtable() {
+    lua_newtable(currState());
+    return;
+}

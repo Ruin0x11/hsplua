@@ -1,7 +1,13 @@
 #include "commands.h"
+#include "dim.h"
 #include "hsplua.h"
 #include "chkstat.h"
 #include "hsp/hsp3plugin.h"
+
+void hsplua_cmd::hl_openlibs() {
+    luaL_openlibs(currState());
+    hsplua_cmd::hl_openlibs_dim();
+}
 
 void hsplua_cmd::hl_newstate() { // 新規Luaステート
 	int statNum = exinfo->HspFunc_prm_getdi(-1); // ステート管理番号
@@ -17,7 +23,8 @@ void hsplua_cmd::hl_newstate() { // 新規Luaステート
 	if (luaStates.size() <= statNum) luaStates.resize(statNum + 1, NULL);
 	luaStates[statNum] = luaL_newstate(); // 新規ステート
 	if (luaStates[statNum] == NULL) throw HSPERR_OUT_OF_MEMORY;
-	currentState = statNum;
+    currentState = statNum;
+    hl_openlibs();
 	stat = statNum;
 	return;
 }
@@ -35,4 +42,8 @@ void hsplua_cmd::hl_close() { // Luaステート破棄
 	lua_close(luaStates[statNum]);
 	luaStates[statNum] = NULL;
 	return;
+}
+
+void hsplua_cmd::hl_error() {
+    luaL_error(currState(), exinfo->HspFunc_prm_gets());
 }

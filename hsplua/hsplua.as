@@ -1,4 +1,4 @@
-#regcmd "_hsp3cmdinit@4" "hsplua.dll"
+#regcmd "_hsp3cmdinit@4","hsplua.dll"
 #cmd hl_newstate                0x00
 #cmd hl_switchstate             0x01
 #cmd hl_close                   0x02
@@ -21,6 +21,19 @@
 #cmd hl_pushstring              0x18
 #cmd hl_pushvalue               0x19
 #cmd hl_pushvarptr              0x1a
+#cmd hl_gettable                0x1b
+#cmd hl_getmetatable            0x1c
+#cmd hl_getglobal               0x1d
+#cmd hl_getfield                0x1e
+#cmd hl_settable                0x1f
+#cmd hl_setmetatable            0x20
+#cmd hl_setglobal               0x21
+#cmd hl_setfield                0x22
+#cmd hl_pushglobaltable         0x23
+#cmd hl_newtable                0x24
+#cmd hl_newmetatable            0x25
+#cmd hl_error                   0x28
+#cmd hl_pushdim                 0x29
 #cmd hl_isboolean               0x80
 #cmd hl_iscfunction             0x81
 #cmd hl_isfunction              0x82
@@ -42,3 +55,7 @@
 #cmd hl_touserdata              0x96
 #cmd hl_gccount                 0x98
 #cmd hl_gcisrunning             0x99
+#cmd hl_gettop                  0x9A
+#cmd hl_pcall                   0x9B
+#cmd hl_dofile                  0x9C
+#cmd hl_dostring                0x9D

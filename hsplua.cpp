@@ -6,10 +6,12 @@
 #include <windows.h>
 #include "hsplua.h"
 #include "hsp/hsp3plugin.h"
+#include "hsp/hspvar_core.h"
 #include "commands.h"
 #include "pushpop.h"
 #include "chktype.h"
 #include "readval.h"
+#include "dim.h"
 #include "gc.h"
 #include <cstdlib>
 
@@ -50,7 +52,20 @@ static int cmdfunc( int cmd )
 		case 0x17: hsplua_cmd::hl_pushnumber();           break;
 		case 0x18: hsplua_cmd::hl_pushstring();           break;
 		case 0x19: hsplua_cmd::hl_pushvalue();            break;
-		case 0x1a: hsplua_cmd::hl_pushvarptr();           break;
+        case 0x1a: hsplua_cmd::hl_pushvarptr();           break;
+        case 0x1b: hsplua_cmd::hl_gettable();             break;
+        case 0x1c: hsplua_cmd::hl_getmetatable();         break;
+        case 0x1d: hsplua_cmd::hl_getglobal();            break;
+        case 0x1e: hsplua_cmd::hl_getfield();             break;
+        case 0x1f: hsplua_cmd::hl_settable();             break;
+        case 0x20: hsplua_cmd::hl_setmetatable();         break;
+        case 0x21: hsplua_cmd::hl_setglobal();            break;
+        case 0x22: hsplua_cmd::hl_setfield();             break;
+        case 0x23: hsplua_cmd::hl_pushglobaltable();      break;
+        case 0x24: hsplua_cmd::hl_newtable();             break;
+        case 0x25: hsplua_cmd::hl_newmetatable();         break;
+        case 0x28: hsplua_cmd::hl_error();                break;
+        case 0x29: hsplua_cmd::hl_pushdim();              break;
 		default: puterror( HSPERR_UNSUPPORTED_FUNCTION ); break;
 	}
 	return RUNMODE_RUN;
@@ -95,7 +110,11 @@ static void *reffunc( int *type_res, int cmd )
 		case 0x95: *type_res = hsplua_func::hl_tostring();        break;
 		case 0x96: *type_res = hsplua_func::hl_touserdata();      break;
 		case 0x98: *type_res = hsplua_func::hl_gccount();         break;
-		case 0x99: *type_res = hsplua_func::hl_gcisrunning();     break;
+        case 0x99: *type_res = hsplua_func::hl_gcisrunning();     break;
+        case 0x9A: *type_res = hsplua_func::hl_gettop();          break;
+        case 0x9B: *type_res = hsplua_func::hl_pcall();           break;
+        case 0x9C: *type_res = hsplua_func::hl_dofile();          break;
+        case 0x9D: *type_res = hsplua_func::hl_dostring();        break;
 		default: puterror( HSPERR_UNSUPPORTED_FUNCTION );         break;
 	}
 
@@ -105,7 +124,12 @@ static void *reffunc( int *type_res, int cmd )
 	if ( *val != ')' ) puterror( HSPERR_INVALID_FUNCPARAM );
 	code_next();
 
-	return (void *)&ref_val;
+    if (*type_res == HSPVAR_FLAG_STR) {
+        return (void*)ref_val.sval;
+    }
+    else {
+        return (void *)&ref_val;
+    }
 }
 
 /*------------------------------------------------------------*/
@@ -127,7 +151,6 @@ int WINAPI DllMain (HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserved)
 {
 	//		DLLエントリー (何もする必要はありません)
 	//
-	free(ref_sval); ref_sval = NULL;
 	return TRUE;
 }
 
@@ -138,7 +161,7 @@ EXPORT void WINAPI hsp3cmdinit( HSP3TYPEINFO *info )
 	//
 	hsp3sdk_init( info );		// SDKの初期化(最初に行なって下さい)
 
-	ref_sval = (char*)malloc(64);
+    ref_sval = (char*)hspmalloc(64);
 
 	info->cmdfunc = cmdfunc;		// 実行関数(cmdfunc)の登録
 	info->reffunc = reffunc;		// 参照関数(reffunc)の登録
